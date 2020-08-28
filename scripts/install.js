@@ -1,7 +1,9 @@
 var fs = require('fs');
 var path = require('path');
+var crypto = require('crypto');
 
 var download_url = 'http://www.angusj.com/resourcehacker/resource_hacker.zip';
+var zip_hash = '7c46c1e9ef2d2e8d69d9962ed75a1938c62403dd8508e03d48a8daad5dda01bca0afcb4464e546f293c046e1d8bb42e54e393517b23ac16074ad35fa69fbe6a3';
 var dir_path = path.join(__dirname,'../bin/');
 var zip_path = path.join(__dirname,'../bin/resource_hacker.zip');
 var bin_path = path.join(__dirname,'../bin/ResourceHacker.exe');
@@ -24,10 +26,28 @@ var request = http.get(download_url, function(response) {
 	response.pipe(file);
 	file.on('finish', function() {
 		file.close(function(err){
-			var zip	= new AdmZip(zip_path);
-			zip.extractAllTo(dir_path, true);
+			// Verify file using hash make MITM harder
+			var fstream = fs.createReadStream(zip_path);
+			var hash = crypto.createHash('sha512');
+			hash.setEncoding('hex');
 			console.log('Download complete');
-			process.exit(0);
+			console.log('Starting integrity check...');
+
+			fstream.on('end', function() {
+				hash.end();
+				calculated_hash = hash.read();
+				if (zip_hash === calculated_hash){
+					var zip	= new AdmZip(zip_path);
+					zip.extractAllTo(dir_path, true);
+					console.log("Extraction complete")
+					process.exit(0);
+				}else{
+					console.log(`File verification failed:\nDownloaded file sha512: ${calculated_hash}`);
+				}
+			});
+
+			fstream.pipe(hash);
+
 		});
 	});
 }).on('error', function(err) { // Handle errors
