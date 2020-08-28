@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 
-var download_url = 'https://www.angusj.com/resourcehacker/resource_hacker.zip';
+var download_url = 'http://www.angusj.com/resourcehacker/resource_hacker.zip';
 var dir_path = path.join(__dirname,'../bin/');
 var zip_path = path.join(__dirname,'../bin/resource_hacker.zip');
 var bin_path = path.join(__dirname,'../bin/ResourceHacker.exe');
