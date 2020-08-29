@@ -42,7 +42,8 @@ var request = http.get(download_url, function(response) {
 					console.log("Extraction complete")
 					process.exit(0);
 				}else{
-					console.log(`File verification failed:\nDownloaded file sha512: ${calculated_hash}`);
+					console.error(`File verification failed:\nDownloaded file sha512: ${calculated_hash}`);
+					process.exit(-1);
 				}
 			});
 
