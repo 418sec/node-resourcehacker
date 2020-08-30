@@ -43,7 +43,11 @@ var request = http.get(download_url, function(response) {
 					process.exit(0);
 				}else{
 					console.error(`File verification failed:\nDownloaded file sha512: ${calculated_hash}`);
-					process.exit(-1);
+					fs.unlink(zip_path, function(err) {
+						if (err) throw err;
+						console.log('File deleted');
+						process.exit(-1);
+					});
 				}
 			});
 
